@@ -96,8 +96,8 @@ func convertCurrency(amount float64, fromCurrency string, toCurrency string) flo
 
 	// Конвертируем через USD (базовая валюта)
 	// Сначала в USD, затем в целевую валюту
-	usdAmount := amount * currencyRates[fromCurrency]
-	result := usdAmount / currencyRates[toCurrency]
+	usdAmount := amount / currencyRates[fromCurrency] // в USD
+	result := usdAmount * currencyRates[toCurrency]   // в целевую валюту
 
 	return result
 }
