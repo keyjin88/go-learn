@@ -90,26 +90,26 @@ func showMenu() {
 // Функция для получения чисел от пользователя
 func getNumbersFromUser() ([]float64, error) {
 	fmt.Print("Введите числа через запятую (например: 2,10,9): ")
-	
+
 	var input string
 	fmt.Scanln(&input)
-	
+
 	numbers, err := parseNumbers(input)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	if len(numbers) == 0 {
 		return nil, fmt.Errorf("не указано ни одного числа")
 	}
-	
+
 	return numbers, nil
 }
 
 // Функция для выполнения вычислений
 func performCalculation(operation string, numbers []float64) {
 	fmt.Printf("\nВведенные числа: %v\n", numbers)
-	
+
 	var result float64
 	switch operation {
 	case "AVG":
