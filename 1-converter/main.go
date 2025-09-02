@@ -8,6 +8,15 @@ import (
 // Доступные валюты для конвертации
 var availableCurrencies = []string{"USD", "EUR", "RUB", "GBP", "JPY"}
 
+// Map для быстрой проверки доступности валют
+var availableCurrenciesMap = map[string]bool{
+	"USD": true,
+	"EUR": true,
+	"RUB": true,
+	"GBP": true,
+	"JPY": true,
+}
+
 // Курсы валют к USD (базовая валюта)
 var currencyRates = map[string]float64{
 	"USD": 1.0,
@@ -55,11 +64,9 @@ func inputCurrency(currencyType string) string {
 		// Приводим к верхнему регистру для унификации
 		input = strings.ToUpper(strings.TrimSpace(input))
 
-		// Проверяем, что введённая валюта доступна
-		for _, currency := range availableCurrencies {
-			if currency == input {
-				return input
-			}
+		// Проверяем, что введённая валюта доступна через map
+		if availableCurrenciesMap[input] {
+			return input
 		}
 
 		fmt.Printf("Ошибка: валюта '%s' не поддерживается. Попробуйте снова.\n", input)
@@ -94,10 +101,20 @@ func convertCurrency(amount float64, fromCurrency string, toCurrency string) flo
 		return amount
 	}
 
+	// Проверяем, что обе валюты существуют в map курсов
+	fromRate, fromExists := currencyRates[fromCurrency]
+	toRate, toExists := currencyRates[toCurrency]
+
+	if !fromExists || !toExists {
+		// В реальном приложении здесь должно быть логирование ошибки
+		// или возврат ошибки, но для простоты возвращаем 0
+		return 0
+	}
+
 	// Конвертируем через USD (базовая валюта)
 	// Сначала в USD, затем в целевую валюту
-	usdAmount := amount / currencyRates[fromCurrency] // в USD
-	result := usdAmount * currencyRates[toCurrency]   // в целевую валюту
+	usdAmount := amount / fromRate // в USD
+	result := usdAmount * toRate   // в целевую валюту
 
 	return result
 }
