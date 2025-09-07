@@ -30,16 +30,16 @@ func main() {
 	showMenu()
 
 	// Ввод исходной валюты
-	fromCurrency := inputCurrency("исходной")
+	fromCurrency := inputCurrency("исходной", &availableCurrenciesMap)
 
 	// Ввод суммы
 	amount := inputAmount()
 
 	// Ввод целевой валюты
-	toCurrency := inputCurrency("целевой")
+	toCurrency := inputCurrency("целевой", &availableCurrenciesMap)
 
 	// Расчёт и вывод результата
-	result := convertCurrency(amount, fromCurrency, toCurrency)
+	result := convertCurrency(amount, fromCurrency, toCurrency, &currencyRates)
 	fmt.Printf("\nРезультат конвертации: %.2f %s = %.2f %s\n",
 		amount, fromCurrency, result, toCurrency)
 }
@@ -55,7 +55,8 @@ func showMenu() {
 }
 
 // inputCurrency запрашивает ввод валюты с валидацией
-func inputCurrency(currencyType string) string {
+// Map передаётся по указателю для единообразия и оптимизации
+func inputCurrency(currencyType string, availableMap *map[string]bool) string {
 	for {
 		fmt.Printf("Введите %s валюту (например, USD): ", currencyType)
 		var input string
@@ -64,8 +65,8 @@ func inputCurrency(currencyType string) string {
 		// Приводим к верхнему регистру для унификации
 		input = strings.ToUpper(strings.TrimSpace(input))
 
-		// Проверяем, что введённая валюта доступна через map
-		if availableCurrenciesMap[input] {
+		// Проверяем, что введённая валюта доступна через map (по указателю)
+		if (*availableMap)[input] {
 			return input
 		}
 
@@ -95,15 +96,16 @@ func inputAmount() float64 {
 }
 
 // convertCurrency рассчитывает конвертацию валют
-func convertCurrency(amount float64, fromCurrency string, toCurrency string) float64 {
+// Map курсов передаётся по указателю для единообразия и оптимизации
+func convertCurrency(amount float64, fromCurrency string, toCurrency string, rates *map[string]float64) float64 {
 	// Если валюты одинаковые, возвращаем исходную сумму
 	if fromCurrency == toCurrency {
 		return amount
 	}
 
-	// Проверяем, что обе валюты существуют в map курсов
-	fromRate, fromExists := currencyRates[fromCurrency]
-	toRate, toExists := currencyRates[toCurrency]
+	// Проверяем, что обе валюты существуют в map курсов (по указателю)
+	fromRate, fromExists := (*rates)[fromCurrency]
+	toRate, toExists := (*rates)[toCurrency]
 
 	if !fromExists || !toExists {
 		// В реальном приложении здесь должно быть логирование ошибки
